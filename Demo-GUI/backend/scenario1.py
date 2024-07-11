@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS, cross_origin
 import sys
-sys.path.append("/Users/linxiwei/Documents/MaskSearch/Archive/wilds")
 from topk import *
 from s1_data_process import data_process
 app = Flask(__name__)
