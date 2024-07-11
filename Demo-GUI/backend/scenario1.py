@@ -417,10 +417,10 @@ if __name__ == '__main__':
     id_val_data, ood_val_data, label_map, pred_map, cam_map, object_detection_map, dataset_examples, in_memory_index_suffix, image_access_order, sorted_class_pairs, names= data_process()
      
     in_memory_index_suffix_in = np.load(
-        f"/Users/linxiwei/Documents/MaskSearch/Archive/wilds/intersect_index.npy"
+        f"./intersect_index.npy"
     )
     in_memory_index_suffix_un = np.load(
-        f"/Users/linxiwei/Documents/MaskSearch/Archive/wilds/union_index.npy"
+        f"./union_index.npy"
     )
 
     
