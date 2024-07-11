@@ -1,0 +1,53 @@
+.misclassified-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.misclassified-line {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+    border: 1px solid gray;
+    border-radius: 8px;
+}
+
+.cell-info {
+    width: 120px;
+}
+
+.larger-img {
+    width: calc(20% - 10px);
+    height: auto;
+    max-width: 100%;
+    object-fit: cover;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.custom-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    margin-right: -10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+}
+
+.custom-btn:hover {
+    background-color: #4CAF50;
+}
+
+.selected {
+    background-color: lightblue;
+}

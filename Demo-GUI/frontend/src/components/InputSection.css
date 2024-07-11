@@ -1,0 +1,135 @@
+.input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 30%;
+    margin-right: 20px;
+    background-color: #f0f0f0;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.input-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+/* Style for labels to ensure they align properly with their input/dropdown */
+.input-label {
+    white-space: nowrap;
+    margin-right: 8px;
+    font-weight: bold;
+}
+
+.input-field, .input-section select {
+    height: 35px;
+    padding: 8px;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    width: 50%;
+    font-weight: bold;
+}
+
+/* Read-only style */
+.input-field.read-only {
+    background-color: #e0e0e0;
+    color: #777;
+    cursor: not-allowed;
+}
+
+.threshold-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    width: 50%;
+}
+
+.threshold-field {
+    width: 50%;
+    height: 35px;
+    border: 1px solid #007bff; 
+    border-radius: 5px;
+    padding: 0 8px;
+    font-size: 0.95rem;
+    font-weight: bold;
+}
+
+.input-section .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.input-section .header .title {
+    margin: 0;
+}
+
+.input-section .mode-switch {
+    display: flex;
+    gap: 8px;
+}
+
+.input-section .mode-switch button {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    border: 1px solid #007bff;
+    background-color: #fff;
+    color: #007bff;
+    font-weight: bold;
+}
+
+.input-section .mode-switch button.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.input-section button {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+}
+
+.input-section button:hover {
+    background-color: #0056b3;
+}
+
+.input-section button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.halfsize-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.start-halfsize-btn, .appending-halfsize-btn {
+    flex: none;
+    width: calc(50% - 4px);
+    background-color: #007bff;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.appending-halfsize-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.start-halfsize-btn:hover {
+    background-color: #0056b3;
+}
