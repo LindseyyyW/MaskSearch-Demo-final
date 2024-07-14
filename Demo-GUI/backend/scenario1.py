@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS, cross_origin
 import sys
+sys.path.append("/Users/linxiwei/Documents/MaskSearch/Archive/wilds")
 from topk import *
 from s1_data_process import data_process
 app = Flask(__name__)
@@ -13,7 +14,8 @@ def pairs():
     for key in sorted_class_pairs.keys():
         cell = "({},{})".format(key[0], key[1])
         data[cell] = sorted_class_pairs[key]
-    #print(data.keys())
+    print(names)
+
     return jsonify({'dict':data, 'names': names})
 
 
@@ -256,44 +258,39 @@ def topk_search_s3():
     region = (0, 0, 384, 384)
     print(enable)
     if not enable:
-        v = 0.1 if reverse else 0.9
-        region_area_threshold = 5000
-        imag = naive_get_images_satisfying_filter(
-            cam_map,
-            object_detection_map,
-            cam_size_y,
+        count = 0
+        images = naive_topk_IOU( cam_size_y,
             cam_size_x,
-            dataset_examples,
+            bin_width,
+            hist_size,
+            examples,
             lv,
             uv,
+            intersection_mask,
+            union_mask,
             region,
-            v,
-            region_area_threshold,
-            ignore_zero_area_region=True,
-            compression=None,
-            reverse=reverse,
-            visualize=False,
+            k,
+            reverse,
         )
-        
-   
-    count, images = get_max_IoU_across_masks_in_memory(
-        cam_size_y=384,
-        cam_size_x=384,
-        bin_width=bin_width,
-        hist_size=2,
-        examples=examples,
-        lv=lv,
-        uv=uv,
-        in_memory_index_suffix_in=in_memory_index_suffix_in,
-        in_memory_index_suffix_un=in_memory_index_suffix_un,
-        region=region,
-        k=k,
-        region_area_threshold=0,
-        ignore_zero_area_region=True,
-        reverse=reverse,
-        available_coords=available_coords,
-        compression=None,
-    )
+    else:
+        count, images = get_max_IoU_across_masks_in_memory(
+            cam_size_y=384,
+            cam_size_x=384,
+            bin_width=bin_width,
+            hist_size=2,
+            examples=examples,
+            lv=lv,
+            uv=uv,
+            in_memory_index_suffix_in=in_memory_index_suffix_in,
+            in_memory_index_suffix_un=in_memory_index_suffix_un,
+            region=region,
+            k=k,
+            region_area_threshold=0,
+            ignore_zero_area_region=True,
+            reverse=reverse,
+            available_coords=available_coords,
+            compression=None,
+        )
     print(images)
     image_ids = [int(image_idx) for (metric, image_idx) in images]
     end = time.time()
@@ -341,41 +338,41 @@ def filter_search_s3():
    
     start = time.time()
     if not enable:
-        region_area_threshold = 5000
-        imag = naive_get_images_satisfying_filter(
-            cam_map,
-            object_detection_map,
+        count = 0
+        images = naive_Filter_IoU(
             cam_size_y,
             cam_size_x,
-            dataset_examples,
+            bin_width,
+            hist_size,
+            examples,
             lv,
             uv,
+            intersection_mask,
+            union_mask,
             region,
             v,
-            region_area_threshold,
-            ignore_zero_area_region=True,
-            compression=None,
-            reverse=reverse,
-            visualize=False,
+            reverse,
+            available_coords,
         )
-    count, images = get_Filter_IoU_across_masks_in_memory(
-        cam_size_y=384,
-        cam_size_x=384,
-        bin_width=bin_width,
-        hist_size=2,
-        examples=examples,
-        lv=lv,
-        uv=uv,
-        in_memory_index_suffix_in=in_memory_index_suffix_in,
-        in_memory_index_suffix_un=in_memory_index_suffix_un,
-        region=region,
-        v=v,
-        region_area_threshold=0,
-        ignore_zero_area_region=True,
-        reverse=reverse,
-        available_coords=available_coords,
-        compression=None,
-    )
+    else:
+        count, images = get_Filter_IoU_across_masks_in_memory(
+            cam_size_y=384,
+            cam_size_x=384,
+            bin_width=bin_width,
+            hist_size=2,
+            examples=examples,
+            lv=lv,
+            uv=uv,
+            in_memory_index_suffix_in=in_memory_index_suffix_in,
+            in_memory_index_suffix_un=in_memory_index_suffix_un,
+            region=region,
+            v=v,
+            region_area_threshold=0,
+            ignore_zero_area_region=True,
+            reverse=reverse,
+            available_coords=available_coords,
+            compression=None,
+        )
     num = 0
     images_count = len(images)
     if(len(images)>50): 
@@ -414,13 +411,13 @@ def union_image_s3(filename):
 
 if __name__ == '__main__':
     #app.run(debug=True)
-    id_val_data, ood_val_data, label_map, pred_map, cam_map, object_detection_map, dataset_examples, in_memory_index_suffix, image_access_order, sorted_class_pairs, names= data_process()
-     
+    id_val_data, ood_val_data, label_map, pred_map, cam_map, object_detection_map, dataset_examples, in_memory_index_suffix, image_access_order, sorted_class_pairs, names, union_mask, intersection_mask= data_process()
+    print("here")
     in_memory_index_suffix_in = np.load(
-        f"./intersect_index.npy"
+        f"/Users/linxiwei/Documents/MaskSearch/Archive/wilds/intersect_index.npy"
     )
     in_memory_index_suffix_un = np.load(
-        f"./union_index.npy"
+        f"/Users/linxiwei/Documents/MaskSearch/Archive/wilds/union_index.npy"
     )
 
     
