@@ -318,6 +318,17 @@ def data_process():
         181: "mazama  temama"
     }
 
-    
+    union_mask = []
+    intersection_mask = []
+    for idx in range(11788):
+        idx += 1
+        union_file_name = f"union_result_{idx}.npy"
+        file_path = f"/Users/linxiwei/Documents/MaskSearch/Archive/MSDemo/backend/union_np/{union_file_name}"
+        cam = np.load(file_path)
+        union_mask.append(cam)
+        in_file_name = f"intersect_result_{idx}.npy"
+        in_file_path = f"/Users/linxiwei/Documents/MaskSearch/Archive/MSDemo/backend/intersect_np/{in_file_name}"
+        cam_in = np.load(in_file_path)
+        intersection_mask.append(cam_in)
 
-    return id_val_data, ood_val_data, label_map, pred_map, cam_map, object_detection_map, dataset_examples, in_memory_index_suffix, image_access_order, sorted_class_pairs, names
+    return id_val_data, ood_val_data, label_map, pred_map, cam_map, object_detection_map, dataset_examples, in_memory_index_suffix, image_access_order, sorted_class_pairs, names, union_mask, intersection_mask
