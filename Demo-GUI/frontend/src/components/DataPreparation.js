@@ -13,7 +13,7 @@ const DataPreparation = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/topk_search/pairs', {
+                const response = await fetch('http://localhost:8000/api/scenario1/topk_search/pairs', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
