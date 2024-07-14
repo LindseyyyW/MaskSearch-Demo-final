@@ -6,8 +6,6 @@ from statistics import mean
 import sys
 import time
 import copy
-from matplotlib import patches, pyplot as plt
-import matplotlib
 import numpy as np
 import torch
 import torchvision
@@ -1389,94 +1387,38 @@ def naive_topk_IOU(   cam_size_y,
     examples,
     lv,
     uv,
-    in_memory_index_suffix_in,
-    in_memory_index_suffix_un,
+    intersection_mask,
+    union_mask,
     region,
     k,
-    region_area_threshold,
-    ignore_zero_area_region,
     reverse,
-    available_coords,
-    compression,
 ):
     x, y, w, h = region # should be the full image
-    print(w,h)
-    x += 1
-    y += 1
-    (
-        lower_ys,
-        upper_ys,
-        lower_xs,
-        upper_xs,
-    ) = get_smallest_region_covering_roi_using_available_coords(
-        cam_size_y, cam_size_x, available_coords, x, y, w, h
-    )
-    
-
-    tot = len(examples)
     heap = []
     if reverse:
         factor = -1
     else:
         factor = 1
-    count = 0
-    for img_offset in range(tot):
-        image_idx = examples[img_offset]
-        if ignore_zero_area_region and (w == 0 or h == 0):
-            count += 1
-            continue
-        box_area = w * h
-        if region_area_threshold is not None and box_area < region_area_threshold:
-            count += 1
-            continue
-
-        # calculate theta for intersect
-        hist_prefix_suffix = in_memory_index_suffix_in[image_idx][:]
-
-
-        box_area = w * h
-        
-        # NOTE: Important: (x, y) -> (j, i) in numpy arrays
-        hist_suffix_sum_smallest_covering_roi = (
-            hist_prefix_suffix[upper_ys, upper_xs]
-            - hist_prefix_suffix[upper_ys, lower_xs]
-            - hist_prefix_suffix[lower_ys, upper_xs]
-            + hist_prefix_suffix[lower_ys, lower_xs]
-        )
     
-        
-        theta_bar_in = hist_suffix_sum_smallest_covering_roi[1]
-
-        
-        # calculate theta for union
-        hist_prefix_suffix = in_memory_index_suffix_un[image_idx][:]
-        
-        # NOTE: Important: (x, y) -> (j, i) in numpy arrays
-        hist_suffix_sum_smallest_covering_roi = (
-            hist_prefix_suffix[upper_ys, upper_xs]
-            - hist_prefix_suffix[upper_ys, lower_xs]
-            - hist_prefix_suffix[lower_ys, upper_xs]
-            + hist_prefix_suffix[lower_ys, lower_xs]
-        )
-       
-        theta_bar_un = hist_suffix_sum_smallest_covering_roi[1]
-        upper_theta = theta_bar_in / theta_bar_un
-
-    
-        area = upper_theta
+    for image_idx in examples:
+        intersect_map = intersection_mask[image_idx]
+        union_map = union_mask[image_idx]
+        intersect_area = np.count_nonzero(intersect_map == 1)
+        union_area = np.count_nonzero(union_map == 1)
+        area = intersect_area / union_area
         if len(heap) < k:
             heapq.heappush(
-                heap, (factor * area, factor * area, image_idx)
-            )
+                        heap, (factor * area, image_idx)
+                    )
         else:
             heapq.heappushpop(
-                heap, (factor * area, factor * area, image_idx)
-            )
-    
+                    heap, (factor * area, image_idx)
+                )
 
-    return count, sorted(
-        [(factor * item[0], item[2]) for item in heap], reverse=not reverse
-    )
+    return heap
+        
+        
+
 
 def naive_Filter_IoU(
     cam_size_y,
@@ -1486,116 +1428,33 @@ def naive_Filter_IoU(
     examples,
     lv,
     uv,
-    in_memory_index_suffix_in,
-    in_memory_index_suffix_un,
+    intersection_mask,
+    union_mask,
     region,
     v,
-    region_area_threshold,
-    ignore_zero_area_region,
     reverse,
     available_coords,
-    compression,
 ):
     x, y, w, h = region # should be the full image
-    print(w,h)
-    # NOTE: since grayscale cams are 1-indexed, we add 1 to both x and y
-    x += 1
-    y += 1
-    (
-        lower_ys,
-        upper_ys,
-        lower_xs,
-        upper_xs,
-    ) = get_smallest_region_covering_roi_using_available_coords(
-        cam_size_y, cam_size_x, available_coords, x, y, w, h
-    )
-    (
-        lower_yl,
-        upper_yl,
-        lower_xl,
-        upper_xl,
-    ) = get_largest_region_covered_by_roi_using_available_coords(
-        cam_size_y, cam_size_x, available_coords, x, y, w, h
-    )
-    grayscale_lv = int(lv * 255)
-    grayscale_uv = int(uv * 255)
-
-    underapprox_bin_l = (grayscale_lv // bin_width) + 1
-    overapprox_bin_u = grayscale_uv // bin_width
-    
-    tot = len(examples)
     heap = []
-
-    count = 0
-    for img_offset in range(tot):
-        image_idx = examples[img_offset]
-        if ignore_zero_area_region and (w == 0 or h == 0):
-            count += 1
-            continue
-        box_area = w * h
-        if region_area_threshold is not None and box_area < region_area_threshold:
-            count += 1
-            continue
-
-        # calculate theta for intersect
-        hist_prefix_suffix = in_memory_index_suffix_in[image_idx][:]
-
-
-        box_area = w * h
-        
-        # NOTE: Important: (x, y) -> (j, i) in numpy arrays
-        hist_suffix_sum_smallest_covering_roi = (
-            hist_prefix_suffix[upper_ys, upper_xs]
-            - hist_prefix_suffix[upper_ys, lower_xs]
-            - hist_prefix_suffix[lower_ys, upper_xs]
-            + hist_prefix_suffix[lower_ys, lower_xs]
-        )
-        hist_suffix_sum_largest_covered_by_roi = (
-            hist_prefix_suffix[upper_yl, upper_xl]
-            - hist_prefix_suffix[upper_yl, lower_xl]
-            - hist_prefix_suffix[lower_yl, upper_xl]
-            + hist_prefix_suffix[lower_yl, lower_xl]
-        )
-
-        
-        theta_bar_in = hist_suffix_sum_smallest_covering_roi[1]
-
-        theta_underline_in = hist_suffix_sum_largest_covered_by_roi[
-            underapprox_bin_l
-        ] - hist_suffix_sum_largest_covered_by_roi[
-            overapprox_bin_u
-        ]
-        
-        # calculate theta for union
-        hist_prefix_suffix = in_memory_index_suffix_un[image_idx][:]
-        
-        # NOTE: Important: (x, y) -> (j, i) in numpy arrays
-        hist_suffix_sum_smallest_covering_roi = (
-            hist_prefix_suffix[upper_ys, upper_xs]
-            - hist_prefix_suffix[upper_ys, lower_xs]
-            - hist_prefix_suffix[lower_ys, upper_xs]
-            + hist_prefix_suffix[lower_ys, lower_xs]
-        )
-        hist_suffix_sum_largest_covered_by_roi = (
-            hist_prefix_suffix[upper_yl, upper_xl]
-            - hist_prefix_suffix[upper_yl, lower_xl]
-            - hist_prefix_suffix[lower_yl, upper_xl]
-            + hist_prefix_suffix[lower_yl, lower_xl]
-        )
-
-        theta_bar_un = hist_suffix_sum_smallest_covering_roi[1]
-
-        upper_theta = theta_bar_in / theta_bar_un
-
-        if  (upper_theta > v and not reverse) or (upper_theta < v and reverse):
-            area = upper_theta
+    if reverse:
+        factor = -1
+    else:
+        factor = 1
+    
+    for image_idx in examples:
+        intersect_map = intersection_mask[image_idx]
+        union_map = union_mask[image_idx]
+        intersect_area = np.count_nonzero(intersect_map == 1)
+        union_area = np.count_nonzero(union_map == 1)
+        area = intersect_area / union_area
+        if area > lv and area < uv:
             heapq.heappush(
-                    heap, (area, area, image_idx)
-            )
-        else:
-            count += 1
+                        heap, (factor * area, image_idx)
+                    )
+        
 
-    return count, [(item[0], item[2]) for item in heap]
+    return heap
 
 
 def get_max_mean_in_area_across_models_in_memory(
