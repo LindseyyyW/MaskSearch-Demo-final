@@ -72,7 +72,7 @@ function ResultsSection({ scenario, imageIds, mode, onSelectImage, executionTime
                 {imageIds.map((id) => (
                     <img
                         key={id}
-                        src={`http://localhost:9000/${imagePath}/${id}.png`}
+                        src={`http://localhost:9000/${imagePath}/${id}.JPEG`}
                         alt={`Image ${id}`}
                         onClick={() => onSelectImage(id)}
                     />
@@ -141,8 +141,8 @@ function ResultsSection({ scenario, imageIds, mode, onSelectImage, executionTime
             </>
         );
     };
-    
-    
+
+
     return (
         <div className={`results-section ${scenario}`}>
             <div className="info-box">

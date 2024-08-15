@@ -66,7 +66,7 @@ function App() {
           <Route path="/data-preparation" element={<DataPreparation />} />
           <Route path="/scenario1" element={
             <div className="main-content">
-              <InputSection 
+              <InputSection
                 scenario="scenario1"
                 onSearchResults={handleSearchResults}
                 onModeChange={handleModeChange}
@@ -75,10 +75,10 @@ function App() {
                 ms={toggle}
               />
               {queryPerformed && (
-                <ResultsSection 
+                <ResultsSection
                   scenario="scenario1"
                   imageIds={imageIds}
-                  onSelectImage={handleImageClick} 
+                  onSelectImage={handleImageClick}
                   mode={mode}
                   aug={isAugment}
                   executionTime={executionTime}
@@ -97,19 +97,20 @@ function App() {
           } />
           <Route path="/scenario2" element={
             <div className="main-content">
-              <InputSection 
+              <InputSection
                 scenario="scenario2"
                 onSearchResults={handleSearchResults}
                 onModeChange={handleModeChange}
                 setExecutionTime={setExecutionTime}
+                isAug={handleStartAugment}
                 ms={toggle}
                 setSkippedImages={setSkippedImages}
               />
               {queryPerformed && (
-                <ResultsSection 
+                <ResultsSection
                   scenario="scenario2"
                   imageIds={imageIds}
-                  onSelectImage={handleImageClick} 
+                  onSelectImage={handleImageClick}
                   mode={mode}
                   executionTime={executionTime}
                   skippedImages={skippedImages}
@@ -128,7 +129,7 @@ function App() {
           } />
           <Route path="/scenario3" element={
             <div className="main-content">
-              <InputSection 
+              <InputSection
                 scenario="scenario3"
                 onSearchResults={handleSearchResults}
                 onModeChange={handleModeChange}
@@ -138,10 +139,10 @@ function App() {
 
               />
               {queryPerformed && (
-                <ResultsSection 
+                <ResultsSection
                   scenario="scenario3"
                   imageIds={imageIds}
-                  onSelectImage={handleImageClick} 
+                  onSelectImage={handleImageClick}
                   mode={mode}
                   executionTime={executionTime}
                   imagesCount={imagesCount}
