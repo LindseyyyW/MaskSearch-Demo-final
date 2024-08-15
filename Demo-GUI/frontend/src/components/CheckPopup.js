@@ -9,7 +9,7 @@
 //     useEffect(() => {
 //         // Fetch the pairs from the backend
 //         const fetchIdx = async () => {
-//             const response = await fetch('http://localhost:8000/api/get_pairs');
+//             const response = await fetch('http://localhost:9000/api/get_pairs');
 //             const data = await response.json();
 //             const idx = data.index
 //             setImages(idx);
@@ -26,7 +26,7 @@
 //                 <button className="close-btn" onClick={onClose}>x</button>
 //                 <div className="images-grid">
 //                     {images.map((img, index) => (
-//                         <img key={index} src={`http://localhost:8000/topk_results/${img}`} alt={`Image ${index}`} className="popup-img" />
+//                         <img key={index} src={`http://localhost:9000/topk_results/${img}`} alt={`Image ${index}`} className="popup-img" />
 //                     ))}
 //                 </div>
 //             </div>

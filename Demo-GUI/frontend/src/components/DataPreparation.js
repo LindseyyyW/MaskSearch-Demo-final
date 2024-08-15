@@ -9,11 +9,11 @@ const DataPreparation = () => {
     const [selectedImages, setSelectedImages] = useState([]);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [animalNames, setNames] = useState({});
-    
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/scenario1/topk_search/pairs', {
+                const response = await fetch('http://localhost:9000/api/scenario1/topk_search/pairs', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -68,15 +68,15 @@ const DataPreparation = () => {
                     // console.log(x);
                     // console.log(y);
                     // console.log(key);
-                    
+
                     return (
                         <div key={index} className={`misclassified-line ${selectedLines[index] ? 'selected' : ''}`}>
                             <div className="cell-info">
                                 <span style={{ color: 'blue' }}>{X}</span> predicted as <span style={{ color: 'blue' }}>{Y}</span>
                             </div>
-                            <img src={`http://localhost:8000/orig_image/${x}.png`} alt={`Image ${x}`} className="larger-img" />
-                            <img src={`http://localhost:8000/topk_results/${img}.png`} alt={`Image ${img}`} className="larger-img" />
-                            <img src={`http://localhost:8000/orig_image/${y}.png`} alt={`Image ${y}`} className="larger-img" />
+                            <img src={`http://localhost:9000/orig_image/${x}.png`} alt={`Image ${x}`} className="larger-img" />
+                            <img src={`http://localhost:9000/topk_results/${img}.png`} alt={`Image ${img}`} className="larger-img" />
+                            <img src={`http://localhost:9000/orig_image/${y}.png`} alt={`Image ${y}`} className="larger-img" />
                             <div className="actions">
                                 <button className="custom-btn" onClick={() => handleOpenPopup(imageIds)}>Examine More Examples</button>
                                 {/* <button className="custom-btn" onClick={() => handleToggleSelect(index)}>

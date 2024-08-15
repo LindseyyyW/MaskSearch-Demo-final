@@ -20,9 +20,9 @@
 //     };
 
 //     return (
-//         <Modal 
-//             isOpen={isOpen} 
-//             onRequestClose={onRequestClose} 
+//         <Modal
+//             isOpen={isOpen}
+//             onRequestClose={onRequestClose}
 //             style={{
 //                 overlay: {
 //                     backgroundColor: 'rgba(0, 0, 0, 0.8)' // Optional: dark overlay
@@ -75,11 +75,11 @@ function ImageSelection({ scenario, isOpen, imageId, onRequestClose, mode }) {
             if (mode === 'Top-K' || mode === 'Filter' || mode === 'Aggregation') {
                 imagePath = 'topk_results';
             }
-            setImageUrl(`http://localhost:8000/${imagePath}/${imageId}.jpg`);
+            setImageUrl(`http://localhost:9000/${imagePath}/${imageId}.jpg`);
         } else if (scenario === 'scenario2') {
             imagePath = 'topk_images';
-            statUrl = `http://localhost:8000/topk_labels/${imageId}`;
-            setImageUrl(`http://localhost:8000/${imagePath}/${imageId}.JPEG`);
+            statUrl = `http://localhost:9000/topk_labels/${imageId}`;
+            setImageUrl(`http://localhost:9000/${imagePath}/${imageId}.JPEG`);
 
             const fetchImageLabels = async () => {
                 const response = await fetch(statUrl, {
@@ -103,7 +103,7 @@ function ImageSelection({ scenario, isOpen, imageId, onRequestClose, mode }) {
             } else if (mode === 'Aggregation') {
                 imagePath = 'aggregation_results';
             }
-            setImageUrl(`http://localhost:8000/${imagePath}/${imageId}.jpg`);
+            setImageUrl(`http://localhost:9000/${imagePath}/${imageId}.jpg`);
         }
     }, [imageId, mode, scenario]);
 
@@ -112,9 +112,9 @@ function ImageSelection({ scenario, isOpen, imageId, onRequestClose, mode }) {
     };
 
     return (
-        <Modal 
-            isOpen={isOpen} 
-            onRequestClose={onRequestClose} 
+        <Modal
+            isOpen={isOpen}
+            onRequestClose={onRequestClose}
             style={{
                 overlay: {
                     backgroundColor: 'rgba(0, 0, 0, 0.8)'
