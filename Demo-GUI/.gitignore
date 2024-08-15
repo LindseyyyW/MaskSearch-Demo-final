@@ -24,3 +24,16 @@ yarn-error.log*
 
 # lock
 package-lock.json
+
+*.pyc
+*.bak
+*.dat
+*.dir
+*.pkl
+*.png
+*.jpg
+*.JPEG
+*.csv
+*.tgz
+*.npy
+*.pth

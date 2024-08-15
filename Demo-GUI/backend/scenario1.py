@@ -1,12 +1,21 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS, cross_origin
-import numpy as np
+
 import sys
-sys.path.append("/Users/linxiwei/Documents/MaskSearch/Archive/wilds")
+from pathlib import Path
+
+# cd Demo-GUI
+main = Path("./backend").resolve()
+sys.path.append(str(main))
+
+import numpy as np
+
 from topk import *
 from s1_data_process import data_process
+
 app = Flask(__name__)
 CORS(app)
+
 
 @app.route('/api/scenario1/topk_search/pairs', methods=['POST'])
 def pairs():
@@ -35,7 +44,6 @@ def topk_search():
     order = data.get('order')
     reverse = False if order == 'DESC' else True
 
-    
     query_command = f"""
     SELECT mask_id
     FROM MasksDatabaseView
@@ -50,7 +58,7 @@ def topk_search():
     cam_size_x = 448
     region_area_threshold = 5000
     available_coords = 64
-   
+
     #get_max_area_in_subregion_in_memory_version
     if enable:
         count, images = get_max_area_in_subregion_in_memory_version(
@@ -107,7 +115,7 @@ def topk_search():
             compression=None,
         )
         count = 0
-    
+
     image_ids = [image_idx for (metric, area, image_idx) in images]
     end = time.time()
     time_used = end - start
@@ -124,17 +132,20 @@ def augment():
     print(img_ids)
     return jsonify({'image_ids': img_ids})
 
+
 @app.route('/api/scenario1/get_pairs', methods=['GET'])
 def get_pairs():
     # Generate a list of 100 pairs (1, 2)
     pairs = [{'x': 3, 'y': 4} for _ in range(100)]
     return jsonify(pairs)
 
+
 @app.route('/api/receive_selected', methods=['POST'])
 def receive_selected():
     selected_lines = request.json.get('selected_lines', [])
     print('Received selected lines:', selected_lines)  # For debugging purposes
     return jsonify({'message': 'Selection received successfully'})
+
 
 @app.route('/api/scenario1/filter_search', methods=['POST'])
 def filter_search():
@@ -150,7 +161,7 @@ def filter_search():
     reverse = True if comparison == '<' else False
     lv = float(pixel_lower_bound)
     uv = float(pixel_upper_bound)
-    
+
     query_command = f"""
     SELECT mask_id
     FROM MasksDatabaseView
@@ -213,26 +224,30 @@ def filter_search():
     # Dummy implementation to return the query command and some mock image IDs
     return jsonify({'query_command': query_command, 'image_ids': image_ids, 'execution_time': time_used, 'count': num_count, 'total': total})
 
+
 @app.route('/topk_results/<filename>')
 def topk_image(filename):
     return send_from_directory('topk_results', filename)
+
 
 @app.route('/filter_results/<filename>')
 def filter_image(filename):
     return send_from_directory('filter_results', filename)
 
+
 @app.route('/augment_results/<filename>')
 def augment_image(filename):
     return send_from_directory('augment_results', filename)
+
 
 @app.route('/orig_image/<filename>')
 def orig_image(filename):
     return send_from_directory('orig_image', filename)
 
 
+
+
 # for scenario3
-
-
 @app.route('/api/scenario3/topk_search', methods=['POST'])
 def topk_search_s3():
     data = request.json
@@ -244,11 +259,10 @@ def topk_search_s3():
     order = data.get('order')
     reverse = False if order == 'DESC' else True
 
-    
     query_command = f"""
     SELECT mask_id,
-    CP(intersect(mask), roi, ({pixel_lower_bound}, {pixel_upper_bound})) 
-    / CP(union(mask), roi, ({pixel_lower_bound}, {pixel_upper_bound})) as iou 
+    CP(intersect(mask), roi, ({pixel_lower_bound}, {pixel_upper_bound}))
+    / CP(union(mask), roi, ({pixel_lower_bound}, {pixel_upper_bound})) as iou
     FROM MasksDatabaseView WHERE mask_type IN (1, 2)
     GROUP BY image_id ORDER BY iou {order} LIMIT {k};
     """
@@ -266,7 +280,8 @@ def topk_search_s3():
     print(enable)
     if not enable:
         count = 0
-        images = naive_topk_IOU( cam_size_y,
+        images = naive_topk_IOU(
+            cam_size_y,
             cam_size_x,
             bin_width,
             hist_size,
@@ -309,7 +324,6 @@ def topk_search_s3():
     return jsonify({'query_command': query_command, 'image_ids': image_ids, 'execution_time': execution_time, 'images_count': len(image_ids), 'count': count, 'total': total})
 
 
-
 @app.route('/api/scenario3/filter_search', methods=['POST'])
 def filter_search_s3():
     data = request.json
@@ -323,12 +337,12 @@ def filter_search_s3():
 
     query_command = f"""
     SELECT mask_id,
-    CP(intersect(mask), roi, ({pixel_lower_bound}, {pixel_upper_bound})) 
-    / CP(union(mask), roi, ({pixel_lower_bound}, {pixel_upper_bound})) as iou 
+    CP(intersect(mask), roi, ({pixel_lower_bound}, {pixel_upper_bound}))
+    / CP(union(mask), roi, ({pixel_lower_bound}, {pixel_upper_bound})) as iou
     FROM MasksDatabaseView WHERE iou {comparison} {threshold}, mask_type IN (1, 2)
     GROUP BY image_id;
     """
-    
+
     # query_command = f"""
     # SELECT mask_id
     # FROM MasksDatabaseView
@@ -345,7 +359,7 @@ def filter_search_s3():
     lv = 0.0
     uv = 1.0
     region = (0, 0, 384, 384)
-   
+
     start = time.time()
     if not enable:
         count = 0
@@ -395,35 +409,37 @@ def filter_search_s3():
     total = 11788
     count = total - count
     return jsonify({'query_command': query_command, 'image_ids': image_ids, 'execution_time' : execution_time, 'images_count': images_count, 'count': count, 'total': total})
-   
+
 
 @app.route('/saliency_images/<filename>')
 def topk_image_s3(filename):
     return send_from_directory('saliency_images', filename)
 
+
 @app.route('/human_att_images/<filename>')
 def filter_image_s3(filename):
     return send_from_directory('human_att_images', filename)
+
 
 @app.route('/intersect_visualization/<filename>')
 def intersect_image_s3(filename):
     return send_from_directory('intersect_visualization', filename)
 
+
 @app.route('/union_visualization/<filename>')
 def union_image_s3(filename):
     return send_from_directory('union_visualization', filename)
 
+
 if __name__ == '__main__':
     #app.run(debug=True)
-    id_val_data, ood_val_data, label_map, pred_map, cam_map, object_detection_map, dataset_examples, in_memory_index_suffix, image_access_order, sorted_class_pairs, names, union_mask, intersection_mask= data_process()
+    id_val_data, ood_val_data, label_map, pred_map, cam_map, object_detection_map, \
+    dataset_examples, in_memory_index_suffix, image_access_order, \
+    sorted_class_pairs, names, union_mask, intersection_mask = data_process()
     print("here")
-    in_memory_index_suffix_in = np.load(
-        f"/Users/linxiwei/Documents/MaskSearch/Archive/wilds/intersect_index.npy"
-    )
-    in_memory_index_suffix_un = np.load(
-        f"/Users/linxiwei/Documents/MaskSearch/Archive/wilds/union_index.npy"
-    )
 
-    
+    in_memory_index_suffix_in = np.load(main/"npy/intersect_index.npy")
+    in_memory_index_suffix_un = np.load(main/"npy/union_index.npy")
+
     app.run(port=9000)
 

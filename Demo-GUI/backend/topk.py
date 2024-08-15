@@ -11,7 +11,7 @@ import torch
 import torchvision
 import cv2
 
-from pytorch_grad_cam.utils.image import show_cam_on_image
+# from pytorch_grad_cam.utils.image import show_cam_on_image
 
 
 def get_generic_image_id_for_wilds(distribution, idx):
@@ -72,7 +72,7 @@ def compute_area_for_cam_agg(cam, att, lv, uv, subregion=None):
     else:
         grid_cam = cam
         grid_att = att
-    
+
     grid = grid_cam / grid_att
     area = np.count_nonzero(grid)
     return area
@@ -288,7 +288,7 @@ def update_max_area_images_in_sub_region_in_memory_version(
         i = image_access_order[offset]
         # object_st = time.time()
         image_idx = examples[i]
-        
+
         if region == "object":
             x, y, w, h = get_object_region(
                 object_detection_map, cam_size_y, cam_size_x, image_idx
@@ -314,8 +314,8 @@ def update_max_area_images_in_sub_region_in_memory_version(
         if region_area_threshold is not None and box_area < region_area_threshold:
             count += 1
             continue
-        
-  
+
+
 
         # ed = time.time()
         # time_for_prefiltering += ed - st
@@ -351,12 +351,12 @@ def update_max_area_images_in_sub_region_in_memory_version(
         # TODO: The current version only uses upper bound. Lower bound should be used to do something as well.
 
         if reverse:
-            approximate_area = hist_suffix_sum[(grayscale_lv // bin_width) + 1] - hist_suffix_sum[(grayscale_uv // bin_width)] 
+            approximate_area = hist_suffix_sum[(grayscale_lv // bin_width) + 1] - hist_suffix_sum[(grayscale_uv // bin_width)]
         else:
             if (grayscale_uv // bin_width) + 1 >= hist_size:
                 approximate_area = hist_suffix_sum[grayscale_lv // bin_width]
             else:
-                approximate_area = hist_suffix_sum[grayscale_lv // bin_width] - hist_suffix_sum[(grayscale_uv // bin_width)+1] 
+                approximate_area = hist_suffix_sum[grayscale_lv // bin_width] - hist_suffix_sum[(grayscale_uv // bin_width)+1]
 
         # ed = time.time()
         # time_for_index_lookup += ed - st
@@ -397,7 +397,7 @@ def update_max_area_images_in_sub_region_in_memory_version(
                 break
             else:
                 count += 1
-        
+
     return count
 
 
@@ -453,7 +453,7 @@ def get_max_area_in_subregion_in_memory_version(
         early_stoppable,
     )
     # print("Images for which heatmaps are not computed:", count, f"({count / len(image_access_order) * 100:.2f}%)")
-    
+
     if reverse:
         factor = -1
     else:
@@ -466,7 +466,7 @@ def get_max_area_in_subregion_in_memory_version(
     # end = time.time()
     # print("Actual query time:", end - start)
     ###
-    
+
     return count, area_images
     ###
 #     cnt = 0
@@ -514,7 +514,7 @@ def get_max_area_in_subregion_in_memory_version(
 #             (x, y), w, h, linewidth=5, edgecolor="b", facecolor="none"
 #         )
 #         #fig, ax = plt.subplots(figsize=(8, 8))
-#         plt.ioff() 
+#         plt.ioff()
 #         start = time.time()
 #         fig = plt.figure(figsize=(8, 8))
 #         ax = plt.gca()
@@ -581,7 +581,7 @@ def vanilla_topk(
             )
             x += 1
             y += 1
-            
+
         if ignore_zero_area_region and (w == 0 or h == 0):
             count += 1
             continue
@@ -625,7 +625,7 @@ def vanilla_topk(
         for (metric, area, image_idx) in area_images
     ]
     area_images = sorted(area_images, key=lambda x: x[0], reverse=not reverse)
-    
+
     return count, area_images
 
 
@@ -756,7 +756,7 @@ def get_images_satisfying_filter(
             )
         hist_prefix_suffix = in_memory_index_suffix[generic_image_id][:]
         box_area = w * h
-        
+
 
         # NOTE: Important: (x, y) -> (j, i) in numpy arrays
         hist_suffix_sum_smallest_covering_roi = (
@@ -803,7 +803,7 @@ def get_images_satisfying_filter(
             # Compute theta_underline
             if not trivial_underapprox:
                 theta_underline_1 = (
-                    hist_suffix_sum_smallest_covering_roi[underapprox_bin_l]  
+                    hist_suffix_sum_smallest_covering_roi[underapprox_bin_l]
                     - hist_suffix_sum_smallest_covering_roi[overapprox_bin_u]
                     - (upper_ys - lower_ys)
                     * (upper_xs - lower_xs)
@@ -1116,7 +1116,7 @@ def get_max_IoU_across_masks_in_memory(
 ):
     x, y, w, h = region # should be the full image
     print(x,y,w,h)
-    
+
     # NOTE: since grayscale cams are 1-indexed, we add 1 to both x and y
     x += 1
     y += 1
@@ -1147,8 +1147,8 @@ def get_max_IoU_across_masks_in_memory(
     grayscale_lv = int(lv * 255)
     grayscale_uv = int(uv * 255)
 
-    bin_l = (grayscale_lv // bin_width) 
-    bin_u = (grayscale_uv // bin_width) 
+    bin_l = (grayscale_lv // bin_width)
+    bin_u = (grayscale_uv // bin_width)
 
 
     tot = len(examples)
@@ -1160,8 +1160,8 @@ def get_max_IoU_across_masks_in_memory(
     count = 0
     for img_offset in range(tot):
         image_idx = examples[img_offset]
-       
-        
+
+
         if ignore_zero_area_region and (w == 0 or h == 0):
             count += 1
             continue
@@ -1173,9 +1173,9 @@ def get_max_IoU_across_masks_in_memory(
         # calculate theta for intersect
         hist_prefix_suffix = in_memory_index_suffix_in[image_idx][:]
         box_area = w * h
-       
-        
-        
+
+
+
         hist_suffix_sum_smallest_covering_roi = (
             hist_prefix_suffix[upper_ys, upper_xs]
             - hist_prefix_suffix[upper_ys, lower_xs]
@@ -1193,10 +1193,10 @@ def get_max_IoU_across_masks_in_memory(
 
         if(image_idx == 94):
             print(hist_suffix_sum_largest_covered_by_roi)
-        
+
         # calculate theta for union
         hist_prefix_suffix = in_memory_index_suffix_un[image_idx][:]
-        
+
         # NOTE: Important: (x, y) -> (j, i) in numpy arrays
         hist_suffix_sum_smallest_covering_roi = (
             hist_prefix_suffix[upper_ys, upper_xs]
@@ -1212,7 +1212,7 @@ def get_max_IoU_across_masks_in_memory(
         )
 
         theta_bar_un = hist_suffix_sum_largest_covered_by_roi[bin_u]
-       
+
         upper_theta = float(theta_bar_in)/ float(theta_bar_un)
 
         if image_idx == 94:
@@ -1220,7 +1220,7 @@ def get_max_IoU_across_masks_in_memory(
             print(image_idx, theta_bar_in, theta_bar_un, upper_theta)
 
         if len(heap) < k or factor * upper_theta > heap[0][0]:
-      
+
             area = upper_theta
             if len(heap) < k:
                 heapq.heappush(
@@ -1317,7 +1317,7 @@ def get_Filter_IoU_across_masks_in_memory(
 
 
         box_area = w * h
-        
+
         # NOTE: Important: (x, y) -> (j, i) in numpy arrays
         hist_suffix_sum_smallest_covering_roi = (
             hist_prefix_suffix[upper_ys, upper_xs]
@@ -1332,7 +1332,7 @@ def get_Filter_IoU_across_masks_in_memory(
             + hist_prefix_suffix[lower_yl, lower_xl]
         )
 
-        
+
         theta_bar_in = hist_suffix_sum_smallest_covering_roi[1]
 
         theta_underline_in = hist_suffix_sum_largest_covered_by_roi[
@@ -1340,10 +1340,10 @@ def get_Filter_IoU_across_masks_in_memory(
         ] - hist_suffix_sum_largest_covered_by_roi[
             overapprox_bin_u
         ]
-        
+
         # calculate theta for union
         hist_prefix_suffix = in_memory_index_suffix_un[image_idx][:]
-        
+
         # NOTE: Important: (x, y) -> (j, i) in numpy arrays
         hist_suffix_sum_smallest_covering_roi = (
             hist_prefix_suffix[upper_ys, upper_xs]
@@ -1371,7 +1371,7 @@ def get_Filter_IoU_across_masks_in_memory(
             count += 1
 
     return count, [(item[0], item[2]) for item in heap]
-    
+
 
 
 def naive_topk_IOU(   cam_size_y,
@@ -1393,7 +1393,7 @@ def naive_topk_IOU(   cam_size_y,
         factor = -1
     else:
         factor = 1
-    
+
     for image_idx in examples:
         intersect_map = intersection_mask[image_idx]
         union_map = union_mask[image_idx]
@@ -1410,8 +1410,8 @@ def naive_topk_IOU(   cam_size_y,
                 )
 
     return heap
-        
-        
+
+
 
 
 def naive_Filter_IoU(
@@ -1435,7 +1435,7 @@ def naive_Filter_IoU(
         factor = -1
     else:
         factor = 1
-    
+
     for image_idx in examples:
         intersect_map = intersection_mask[image_idx]
         union_map = union_mask[image_idx]

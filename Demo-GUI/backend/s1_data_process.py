@@ -1,8 +1,11 @@
 import sys
+from pathlib import Path
 
-sys.argv = [""]
-sys.path.append("/Users/linxiwei/Documents/MaskSearch/Archive/masksearch")
-                
+# sys.argv = [""]
+# cd Demo-GUI
+main = Path("./backend").resolve()
+sys.path.append(str(main))
+
 from topk import *
 import argparse
 import json
@@ -11,17 +14,17 @@ import matplotlib.pyplot as plt
 import torch
 import torchvision
 import torchvision.transforms as transforms
-from utils import *
-from pytorch_grad_cam import (
-    AblationCAM,
-    EigenGradCAM,
-    GradCAM,
-    GradCAMPlusPlus,
-    HiResCAM,
-    LayerCAM,
-    RandomCAM,
-)
-from pytorch_grad_cam.utils.image import show_cam_on_image
+# from utils import *
+# from pytorch_grad_cam import (
+#     AblationCAM,
+#     EigenGradCAM,
+#     GradCAM,
+#     GradCAMPlusPlus,
+#     HiResCAM,
+#     LayerCAM,
+#     RandomCAM,
+# )
+# from pytorch_grad_cam.utils.image import show_cam_on_image
 import wilds
 from wilds import get_dataset
 from wilds.common.data_loaders import get_eval_loader, get_train_loader
@@ -53,7 +56,7 @@ def data_process():
         ),
     )
 
-    
+
 
     # Load from disk
     cam_map = shelve.open(dir + "id_ood_val_cam_map.shelve")
@@ -62,7 +65,7 @@ def data_process():
     with open(dir + "id_ood_val_label.pkl", "rb") as f:
         label_map = pickle.load(f)
 
-    
+
 
     id_total = 7314
     ood_total = 14961
@@ -70,7 +73,7 @@ def data_process():
     for distribution, image_total in zip(["id_val", "ood_val"], [id_total, ood_total]):
         for image_idx in range(1, 1 + image_total):
             dataset_examples.append(f"{distribution}_{image_idx}")
-        
+
     hist_size = 16
     hist_edges = []
     bin_width = 256 // hist_size
@@ -105,11 +108,11 @@ def data_process():
             x = label_map[img]
             y = pred_map[img]
             a, b, w, h = get_object_region(
-            object_detection_map, cam_size_y, cam_size_x, img
+                object_detection_map, cam_size_y, cam_size_x, img
             )
             if w==0 or h==0:
                 continue
-            
+
             if ((x,y) in class_pairs):
                 class_pairs.get((x,y)).append(img)
             else:
@@ -128,7 +131,7 @@ def data_process():
             keys_to_delete.append(key)
         elif a==1 and b==146:
             keys_to_delete.append(key)
-        
+
 
     # Deleting the items
     for key in keys_to_delete:
