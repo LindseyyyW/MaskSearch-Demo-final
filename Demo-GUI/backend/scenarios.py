@@ -329,9 +329,10 @@ def topk_search_np(query_command, k, lv, uv, reverse):
     image_ids = [image_idx for (image_idx, dispersion) in top_k]
     end = time.time()
 
+    total = len(cam_map_2)
     execution_time = end - start
     print("(Numpy naive) Query time:", end - start)
-    return jsonify({'query_command': query_command, 'image_ids': image_ids, 'skipped_images_count': 0, 'execution_time': execution_time})
+    return jsonify({'query_command': query_command, 'image_ids': image_ids, 'count': total, 'total': total, 'execution_time': execution_time})
 
 
 @app.route('/topk_cams/<filename>')
