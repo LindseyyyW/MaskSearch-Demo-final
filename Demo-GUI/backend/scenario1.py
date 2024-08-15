@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS, cross_origin
+import numpy as np
 import sys
 sys.path.append("/Users/linxiwei/Documents/MaskSearch/Archive/wilds")
 from topk import *
@@ -105,12 +106,14 @@ def topk_search():
             available_coords=None,
             compression=None,
         )
+        count = 0
     
     image_ids = [image_idx for (metric, area, image_idx) in images]
     end = time.time()
     time_used = end - start
-    print("time: ", end - start)
-    return jsonify({'query_command': query_command, 'image_ids': image_ids, 'execution_time': time_used})
+    total = len(cam_map)
+    count = total - count
+    return jsonify({'query_command': query_command, 'image_ids': image_ids, 'execution_time': time_used, 'count': count, 'total': total})
 
 
 @app.route('/api/scenario1/augment', methods=['POST'])
@@ -197,14 +200,18 @@ def filter_search():
             reverse=reverse,
             visualize=False,
         )
+        count = 0
     num = 0
     end = time.time()
     time_used = end - start
-    
-
+    total = len(cam_map)
+    num_count = np.sum(count)
+    num_count = total - num_count
+    num_count = int(num_count)
+    print(total, num_count)
     image_ids = [image_idx for (metric,image_idx) in images]
     # Dummy implementation to return the query command and some mock image IDs
-    return jsonify({'query_command': query_command, 'image_ids': image_ids, 'execution_time': time_used})
+    return jsonify({'query_command': query_command, 'image_ids': image_ids, 'execution_time': time_used, 'count': num_count, 'total': total})
 
 @app.route('/topk_results/<filename>')
 def topk_image(filename):
@@ -291,12 +298,15 @@ def topk_search_s3():
             available_coords=available_coords,
             compression=None,
         )
-    print(images)
     image_ids = [int(image_idx) for (metric, image_idx) in images]
+    image_ids = sorted(image_ids)
+    print(image_ids)
     end = time.time()
     time_used = end - start
     execution_time = round(time_used, 3)
-    return jsonify({'query_command': query_command, 'image_ids': image_ids, 'execution_time': execution_time, 'images_count': len(image_ids)})
+    total = 11788
+    count = total - count
+    return jsonify({'query_command': query_command, 'image_ids': image_ids, 'execution_time': execution_time, 'images_count': len(image_ids), 'count': count, 'total': total})
 
 
 
@@ -375,22 +385,16 @@ def filter_search_s3():
         )
     num = 0
     images_count = len(images)
-    if(len(images)>50): 
-        num = 50
-    else: 
-        num = len(images)
-    
- 
-    images = sorted(
-        [(item[0], item[1]) for item in images], reverse=not reverse
-    )
+    num = len(images)
     print(images)
     image_ids = [int(image_idx) for (metric,image_idx) in images[:num]]
+    image_ids = sorted(image_ids)
     end = time.time()
     time_used = end - start
     execution_time = round(time_used, 3)
-    
-    return jsonify({'query_command': query_command, 'image_ids': image_ids, 'execution_time' : execution_time, 'images_count': images_count})
+    total = 11788
+    count = total - count
+    return jsonify({'query_command': query_command, 'image_ids': image_ids, 'execution_time' : execution_time, 'images_count': images_count, 'count': count, 'total': total})
    
 
 @app.route('/saliency_images/<filename>')
@@ -421,5 +425,5 @@ if __name__ == '__main__':
     )
 
     
-    app.run(port=8000)
+    app.run(port=9000)
 
