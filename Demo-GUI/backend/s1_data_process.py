@@ -33,12 +33,11 @@ import time
 
 def data_process():
 
-    dir="/Users/linxiwei/Documents/MaskSearch/Archive/wilds/"
     # Load the full dataset, and download it if necessary
     dataset = get_dataset(
         dataset="iwildcam",
-        download=True,
-        root_dir="/Users/linxiwei/Documents/MaskSearch/Archive/wilds/"
+        download=False,
+        root_dir=str(main)
     )
 
     # Get the ID validation set
@@ -56,16 +55,15 @@ def data_process():
         ),
     )
 
-
+    # print("iwildcam has been prepared")
+    # exit(0)
 
     # Load from disk
-    cam_map = shelve.open(dir + "id_ood_val_cam_map.shelve")
-    with open(dir + "id_ood_val_pred.pkl", "rb") as f:
+    cam_map = shelve.open(main/"id_ood/id_ood_val_cam_map.shelve")
+    with open(main/"id_ood/id_ood_val_pred.pkl", "rb") as f:
         pred_map = pickle.load(f)
-    with open(dir + "id_ood_val_label.pkl", "rb") as f:
+    with open(main/"id_ood/id_ood_val_label.pkl", "rb") as f:
         label_map = pickle.load(f)
-
-
 
     id_total = 7314
     ood_total = 14961
@@ -85,18 +83,16 @@ def data_process():
 
     object_detection_map = load_object_region_index_in_memory(
         dataset_examples,
-        dir + "id_ood_val_object_detection_map.shelve",
+        main/"id_ood/id_ood_val_object_detection_map.shelve",
     )
 
     in_memory_index_suffix = np.load(
-        f"{dir}id_ood_val_cam_hist_prefix_{hist_size}_in_memory_available_coords_{available_coords}_suffix.npy"
+        main/f"id_ood/id_ood_val_cam_hist_prefix_{hist_size}_in_memory_available_coords_{available_coords}_suffix.npy"
     )
 
     image_access_order = range(len(dataset_examples))
 
     #compute confusion matrix
-
-
 
     cam_size_y = 448
     cam_size_x = 448
@@ -131,7 +127,6 @@ def data_process():
             keys_to_delete.append(key)
         elif a==1 and b==146:
             keys_to_delete.append(key)
-
 
     # Deleting the items
     for key in keys_to_delete:
@@ -326,11 +321,11 @@ def data_process():
     for idx in range(11788):
         idx += 1
         union_file_name = f"union_result_{idx}.npy"
-        file_path = f"/Users/linxiwei/Documents/MaskSearch/Archive/MSDemo/backend/union_np/{union_file_name}"
+        file_path = str(main/f"union_np/{union_file_name}")
         cam = np.load(file_path)
         union_mask.append(cam)
         in_file_name = f"intersect_result_{idx}.npy"
-        in_file_path = f"/Users/linxiwei/Documents/MaskSearch/Archive/MSDemo/backend/intersect_np/{in_file_name}"
+        in_file_path = str(main/f"intersect_np/{in_file_name}")
         cam_in = np.load(in_file_path)
         intersection_mask.append(cam_in)
 

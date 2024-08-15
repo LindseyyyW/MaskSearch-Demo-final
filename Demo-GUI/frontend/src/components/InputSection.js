@@ -1,9 +1,9 @@
 // src/components/InputSection.js
 import React, { useState } from 'react';
 import QueryCommand from './QueryCommand';
-import { Pie } from 'react-chartjs-2';
+// import { Pie } from 'react-chartjs-2';
 import Modal from './Modal';
-import './InputSection.css'; 
+import './InputSection.css';
 
 
 function InputSection({scenario, onSearchResults, onModeChange, setExecutionTime, isAug, ms}) {
@@ -90,7 +90,7 @@ function InputSection({scenario, onSearchResults, onModeChange, setExecutionTime
         console.log(isModalOpen);
         setIsModalOpen(true); // Open the modal
     };
-    
+
     const closeModal = () => {
         setIsModalOpen(false); // Close the modal
     };
@@ -215,11 +215,11 @@ function InputSection({scenario, onSearchResults, onModeChange, setExecutionTime
                     <button className="start-halfsize-btn" onClick={handleStartAugment} disabled={!isQueryActive}>
                         Augment
                     </button>
-                    
+
                     <button className="appending-halfsize-btn" onClick={handleExc} disabled={!isQueryActive}>
                         Execution Detail
                     </button>
-                    
+
                 </div>
                 <QueryCommand command={queryCommand} />
                 <Modal isModalOpen={isModalOpen} loadedCount={loadedCount} totalCount={totalCount} onClose={closeModal} />

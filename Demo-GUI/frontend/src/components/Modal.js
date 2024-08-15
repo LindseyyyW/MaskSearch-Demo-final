@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Chart from 'chart.js/auto'; 
+import Chart from 'chart.js/auto';
 import './Modal.css'
 
 const Modal = ({ isModalOpen, loadedCount, totalCount, onClose}) => {
