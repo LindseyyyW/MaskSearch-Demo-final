@@ -65,8 +65,8 @@ function ResultsSection({ scenario, imageIds, mode, onSelectImage, executionTime
                 <span className="time-value">{executionTime.toFixed(3)} seconds</span>
             </div>
             <div className="image-count-info">
-                <span className="image-count-label">Skipped Images Count:</span>
-                <span className="image-count-value">{skippedImages}</span>
+                <span className="image-count-label">Returned Examples:</span>
+                <span className="image-count-value">{imageIds.length}</span>
             </div>
             <div className="image-container">
                 {imageIds.map((id) => (
