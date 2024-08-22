@@ -355,7 +355,6 @@ def topk_labels_2(image_id):
 ###############################################################################
 
 # for scenario3
-
 @app.route('/api/scenario3/topk_search', methods=['POST'])
 def topk_search_s3():
     data = request.json
@@ -367,10 +366,11 @@ def topk_search_s3():
     order = data.get('order')
     reverse = False if order == 'DESC' else True
 
+    
     query_command = f"""
     SELECT mask_id,
-    CP(intersect(mask), roi, ({pixel_lower_bound}, {pixel_upper_bound}))
-    / CP(union(mask), roi, ({pixel_lower_bound}, {pixel_upper_bound})) as iou
+    CP(intersect(mask), roi, ({pixel_lower_bound}, {pixel_upper_bound})) 
+    / CP(union(mask), roi, ({pixel_lower_bound}, {pixel_upper_bound})) as iou 
     FROM MasksDatabaseView WHERE mask_type IN (1, 2)
     GROUP BY image_id ORDER BY iou {order} LIMIT {k};
     """
@@ -385,11 +385,11 @@ def topk_search_s3():
     lv = 0.0
     uv = 1.0
     region = (0, 0, 384, 384)
-    print(enable)
+    
+    print(reverse)
     if not enable:
         count = 0
-        images = naive_topk_IOU(
-            cam_size_y,
+        images = naive_topk_IOU( cam_size_y,
             cam_size_x,
             bin_width,
             hist_size,
@@ -421,8 +421,9 @@ def topk_search_s3():
             available_coords=available_coords,
             compression=None,
         )
-    image_ids = [int(image_idx) for (metric, image_idx) in images]
-    image_ids = sorted(image_ids)
+    print("***********")
+    print(images)
+    image_ids = [int(image_idx)+1 for (metric, image_idx) in images]
     print(image_ids)
     end = time.time()
     time_used = end - start
@@ -509,7 +510,7 @@ def filter_search_s3():
     images_count = len(images)
     num = len(images)
     print(images)
-    image_ids = [int(image_idx) for (metric,image_idx) in images[:num]]
+    image_ids = [int(image_idx)+1 for (metric,image_idx) in images[:num]]
     image_ids = sorted(image_ids)
     end = time.time()
     time_used = end - start
@@ -545,13 +546,19 @@ if __name__ == '__main__':
     dataset_examples, in_memory_index_suffix, image_access_order, \
     sorted_class_pairs, names, union_mask, intersection_mask = data_process()
 
+    print("here")
+
     image_total_2, dataset_examples_2, image_access_order_2, \
     hist_size_2, hist_edges_2, bin_width_2, cam_size_y_2, cam_size_x_2, available_coords_2, \
     in_memory_index_suffix_2, cam_map_2, image_map_2, correctness_map_2, attack_map_2, \
     region_area_threshold_2, region_2 = setup()
 
+    print("here")
+
     in_memory_index_suffix_in = np.load(main/"npy/intersect_index.npy")
     in_memory_index_suffix_un = np.load(main/"npy/union_index.npy")
+
+    print("hi")
 
     app.run(port=9000)
 
